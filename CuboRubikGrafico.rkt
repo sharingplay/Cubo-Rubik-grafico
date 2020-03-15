@@ -1,22 +1,22 @@
 #lang racket
+(provide run)
 (require (lib "graphics.ss" "graphics"))(open-graphics) ;;incluye la libreria que se va a utilizar
 
 ;;Tamano de las filas del cubo
-(define tamano 3)
+(define tamano 2)
 
 ;;creacion de ventana con ancho y largo
 (define ventana(open-viewport "Cubo Rubik" (* tamano 100) (* tamano 100)))
 (define ventana2 (open-pixmap "ventana auxiliar" 800 600));;ventana auxiliar en la que se dibuja
 
+
 ;;Se definen los valores del cubo a dibujar
-(define listaCuadros '((("red") ("green") ("blue") ("yellow") ("red") ("orange") ("blue") ("black") ("yellow"))
-(("blue") ("orange") ("green") ("red") ("blue") ("yellow") ("green") ("black") ("pink"))
-(("black") ("green") ("orange") ("yellow") ("red") ("green") ("blue") ("green") ("black"))
-(("black") ("green") ("blue") ("yellow") ("orange") ("green") ("red") ("blue") ("yellow"))
-(("orange") ("red") ("green") ("blue") ("yellow") ("blue") ("black") ("pink") ("red"))
-(("yellow") ("orange") ("black") ("blue") ("red") ("green") ("green") ("yellow") ("pink"))))
-  #| '((("pink") ("green") ("blue") ("yellow")) (("blue") ("orange") ("green") ("red")) (("black") ("green") ("orange") ("yellow"))
-                    (("black") ("green") ("blue") ("yellow")) (("orange") ("red") ("green") ("blue")) (("yellow") ("orange") ("black") ("blue")))) |#
+(define listaCuadros null)
+
+(define (run lista)
+  (set! listaCuadros lista)
+  (teclado #\a)
+  )
 
 
 
@@ -101,4 +101,3 @@
           )
       )
   )
-(teclado #\w)
