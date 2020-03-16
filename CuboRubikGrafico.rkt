@@ -3,11 +3,10 @@
 (require (lib "graphics.ss" "graphics"))(open-graphics) ;;incluye la libreria que se va a utilizar
 
 ;;Tamano de las filas del cubo
-(define tamano 5)
+(define tamano 4)
 ;;creacion de ventana con ancho y largo
-(define ventana(open-viewport "Cubo Rubik" (* tamano 100) (* tamano 100)))
-(define ventana2 (open-pixmap "ventana auxiliar" 800 600));;ventana auxiliar en la que se dibuja
-
+(define ventana null)
+(define ventana2 null);;ventana auxiliar en la que se dibuja
 
 ;;Se definen los valores del cubo a dibujar
 (define listaCuadros null)
@@ -15,6 +14,8 @@
 (define (run lista size)
   (set! listaCuadros lista)
   (set! tamano size)
+  (set! ventana(open-viewport "Cubo Rubik" (* tamano 100) (* tamano 100)))
+  (set! ventana2 (open-pixmap "ventana auxiliar" 800 600));;ventana auxiliar en la que se dibuja
   (teclado #\a)
   )
 
@@ -94,7 +95,11 @@
                             (teclado (key-value (get-key-press ventana))))
                   
                           (if (equal? tecla #\space)
-                             listaCuadros
+                              (begin
+                                (close-viewport ventana)
+                                listaCuadros)
+                             
+                             
                               ;else
                               (teclado (key-value (get-key-press ventana)))
                               )

@@ -1,21 +1,5 @@
 #lang racket
 (require "CuboRubikGrafico.rkt")
-(define (len lista)
-  ;;Devuelve el tamano de una lista
-  ;;El indice empieza en 1
-  ;;Tomado del libro de Scheme
-  (cond ((null? lista)0)
-        (else( + 1 (len(cdr lista))))
-        )
-  )
-(define (indice index lista)
-  ;;Devuelve el elemento en una cierta posicion
-  ;;Tomado del libro de Scheme
-  (cond ((null? lista)#f)
-        ((equal? index 1) (car lista))
-        (else (indice (- index 1) (cdr lista)))
-        )
-  )
          
 (define (RS X Cubo Movs)
  ;; Funcion principal
@@ -41,7 +25,9 @@
        )
   (else Cubo))
   )
+
 (define (validaEntradas? cubo)
+  ;Valida que la lista ingresada sea valida
   (cond ((null? cubo)#t)
         (else(
               cond((or (equal? (car cubo) "white") (equal? (car cubo) "red") (equal? (car cubo) "orange") (equal? (car cubo) "blue") (equal? (car cubo) "yellow")
@@ -57,6 +43,8 @@
         )
   )
 (define (columnas cubo pos arriba tamano)
+  ;;Movimiento de las columnas
+  ;;Si arriba es verdadero la direccion va hacia la arriba
   (cond ((equal? #t arriba)
          (laterales cubo pos arriba tamano (append
           (list(transpuesta(reemplazar (transpuesta (dividirFilas(car cubo) tamano '())) pos '() 1 (indice pos (transpuesta (dividirFilas (indice 6 cubo) tamano '()))))))
@@ -82,6 +70,7 @@
   )
 )
 (define (laterales cuboIni pos arriba tamano cubo)
+  ;;Movimiento de las caras laterales
   (cond ((and (> pos 1) (< pos tamano))
          (reemplazar (reemplazar cubo 2 '() 1 (dividirFilas (indice 2 cuboIni) tamano '())) 4 '() 1 (dividirFilas (indice 4 cuboIni) tamano '()))
          )
@@ -125,7 +114,7 @@
         )
   )
 (define (tapas cubo pos derecha tamano)
-  ;;Movimiento de las tapas segun el movimiento
+  ;;Movimiento de las caras superiores e inferiores
   (cond ((and (> pos 1) (< pos tamano))
          (append
           (list(dividirFilas (indice 5 cubo) tamano '()))
@@ -155,10 +144,6 @@
         )
               
    )
-(define (unirTodo cubo)
-  (print (unirLista (unirCaras cubo '()) '()))
-  (unirLista (unirCaras cubo '()) '())
-  )
                 
 (define (unirCaras cubo result)
   ;; Funcion que une las filas de un cubo para formar caras
@@ -242,5 +227,21 @@
   (cond ((null? lista) (reverse caras))
         (else(cubo tamano (cortarUltimos lista (* tamano tamano) '() 0)
                    (append (list (cortarPrimeros lista (* tamano tamano) '() 0)) caras)))
+        )
+  )
+(define (len lista)
+  ;;Devuelve el tamano de una lista
+  ;;El indice empieza en 1
+  ;;Tomado del libro de Scheme
+  (cond ((null? lista)0)
+        (else( + 1 (len(cdr lista))))
+        )
+  )
+(define (indice index lista)
+  ;;Devuelve el elemento en una cierta posicion
+  ;;Tomado del libro de Scheme
+  (cond ((null? lista)#f)
+        ((equal? index 1) (car lista))
+        (else (indice (- index 1) (cdr lista)))
         )
   )
