@@ -1,6 +1,5 @@
 #lang racket
 (require "CuboRubikGrafico.rkt")
-
 (define (len lista)
   ;;Devuelve el tamano de una lista
   ;;El indice empieza en 1
@@ -19,17 +18,91 @@
   )
          
 (define (RS X Cubo Movs)
-  ;; Funcion principal
-  (cond ((not (zero? (modulo (len Cubo) X)))'(Debe ser de tamano X))
-        (else (cubo X Cubo '()))
-        )
+ ;; Funcion principal
+  (cond((and (validaEntradas? Cubo) (not (null? Movs)))
+       (cond((equal? 'C (indice 1 (car Movs)))
+            (cond ((equal? 'A (indice 3 (car Movs)))       
+                  (RS X (unirLista(run(unirCaras(movimientos (cubo X Cubo '()) (indice 2 (car Movs)) #t #f X)'()) X) '())(cdr Movs))
+                  ))
+            (cond ((equal? 'B (indice 3 (car Movs)))
+                  (RS X (unirLista(run(unirCaras(movimientos (cubo X Cubo '()) (indice 2 (car Movs)) #f #f X)'()) X) '())(cdr Movs))
+                  ))
+                   )
+            )
+       (cond((equal? 'F (indice 1 (car Movs)))
+            (cond ((equal? 'D (indice 3 (car Movs)))       
+                  (RS X (unirLista(run(unirCaras(movimientos (cubo X Cubo '()) (indice 2 (car Movs)) #t #t X)'()) X) '())(cdr Movs))
+                  ))
+            (cond ((equal? 'I (indice 3 (car Movs)))
+                  (RS X (unirLista(run(unirCaras(movimientos (cubo X Cubo '()) (indice 2 (car Movs)) #f #t X)'()) X) '())(cdr Movs))
+                  ))
+                   )
+            )
+       )
+  (else Cubo))
   )
-(define (movimientos cubo pos derAb fila tamano)
+(define (validaEntradas? cubo)
+  (cond ((null? cubo)#t)
+        (else(
+              cond((or (equal? (car cubo) "white") (equal? (car cubo) "red") (equal? (car cubo) "orange") (equal? (car cubo) "blue") (equal? (car cubo) "yellow")
+                  (equal? (car cubo) "green")) (validaEntradas? (cdr cubo)))
+                   (else #f)))))
+(define (movimientos cubo pos derArr fila tamano)
   ;;Evalúa el tipo de movimiento y llama a la funcion correspondiente
   (cond ((equal? #t fila)
-         (filas cubo pos derAb tamano))
-        ))
-
+         (filas cubo pos derArr tamano))
+        ((equal? #f fila)
+         (columnas cubo pos derArr tamano)
+         )
+        )
+  )
+(define (columnas cubo pos arriba tamano)
+  (cond ((equal? #t arriba)
+         (laterales cubo pos arriba tamano (append
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(car cubo) tamano '())) pos '() 1 (indice pos (transpuesta (dividirFilas (indice 6 cubo) tamano '()))))))
+          (list(dividirFilas (indice 2 cubo) tamano '()))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 3 cubo) tamano '())) (- tamano (- pos 1)) '() 1 (reverse(indice (- tamano (- pos 1)) (reverse(transpuesta (dividirFilas (indice 5 cubo) tamano '()))))))))
+          (list(dividirFilas (indice 4 cubo) tamano '()))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 5 cubo) tamano '())) pos '() 1 (indice pos (transpuesta (dividirFilas (indice 1 cubo) tamano '()))))))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 6 cubo) tamano '())) pos '() 1 (reverse(indice (- tamano (- pos 1)) (transpuesta (dividirFilas (indice 3 cubo) tamano '())))))))
+          ))
+         
+        )
+        ((equal? #f arriba)
+         (laterales cubo pos arriba tamano (append
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(car cubo) tamano '())) pos '() 1 (indice pos (transpuesta (dividirFilas (indice 5 cubo) tamano '()))))))
+          (list(dividirFilas (indice 2 cubo) tamano '()))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 3 cubo) tamano '())) (- tamano (- pos 1)) '() 1 (reverse(indice pos (transpuesta (dividirFilas (indice 6 cubo) tamano '())))))))
+          (list(dividirFilas (indice 4 cubo) tamano '()))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 5 cubo) tamano '())) pos '() 1 (reverse(indice (- tamano (- pos 1)) (transpuesta (dividirFilas (indice 3 cubo) tamano '())))))))
+          (list(transpuesta(reemplazar (transpuesta (dividirFilas(indice 6 cubo) tamano '())) pos '() 1 (indice pos (transpuesta (dividirFilas (indice 1 cubo) tamano '()))))))
+          )))
+         
+              
+  )
+)
+(define (laterales cuboIni pos arriba tamano cubo)
+  (cond ((and (> pos 1) (< pos tamano))
+         (reemplazar (reemplazar cubo 2 '() 1 (dividirFilas (indice 2 cuboIni) tamano '())) 4 '() 1 (dividirFilas (indice 4 cuboIni) tamano '()))
+         )
+        (else(
+              cond ((equal? #t arriba)
+                     (cond ((equal? pos 1)
+                            (reemplazar (reemplazar cubo 2 '() 1 (dividirFilas (indice 2 cuboIni) tamano '())) 4 '() 1 (reverse(transpuesta (dividirFilas (indice 4 cuboIni) tamano '()))))
+                            )
+                           (else
+                            (reemplazar (reemplazar cubo 2 '() 1 (transpuesta (reverse(indice 2 cubo)))) 4 '() 1 (dividirFilas (indice 4 cuboIni) tamano '())))))
+                            
+                     ((equal? #f arriba)
+                      (cond ((equal? pos 1)
+                             (reemplazar (reemplazar cubo 2 '() 1 (dividirFilas (indice 2 cuboIni) tamano '())) 4 '() 1 (transpuesta (reverse(indice 4 cubo)))))
+                            (else
+                             (reemplazar (reemplazar cubo 4 '() 1 (dividirFilas (indice 4 cuboIni) tamano '())) 2 '() 1 (reverse(transpuesta (dividirFilas (indice 2 cuboIni) tamano '())))))))                   )
+             )
+        )
+              
+   )
+        
 (define (filas cubo pos derecha tamano)
   ;;Movimiento de las filas
   ;;Si derecha es verdadero la direccion va hacia la derecha
@@ -82,7 +155,10 @@
         )
               
    )
-                                   
+(define (unirTodo cubo)
+  (print (unirLista (unirCaras cubo '()) '()))
+  (unirLista (unirCaras cubo '()) '())
+  )
                 
 (define (unirCaras cubo result)
   ;; Funcion que une las filas de un cubo para formar caras

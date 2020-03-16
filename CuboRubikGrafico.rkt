@@ -3,8 +3,7 @@
 (require (lib "graphics.ss" "graphics"))(open-graphics) ;;incluye la libreria que se va a utilizar
 
 ;;Tamano de las filas del cubo
-(define tamano 2)
-
+(define tamano 5)
 ;;creacion de ventana con ancho y largo
 (define ventana(open-viewport "Cubo Rubik" (* tamano 100) (* tamano 100)))
 (define ventana2 (open-pixmap "ventana auxiliar" 800 600));;ventana auxiliar en la que se dibuja
@@ -13,8 +12,9 @@
 ;;Se definen los valores del cubo a dibujar
 (define listaCuadros null)
 
-(define (run lista)
+(define (run lista size)
   (set! listaCuadros lista)
+  (set! tamano size)
   (teclado #\a)
   )
 
@@ -35,7 +35,7 @@
   (cond ((null? lista)
          #f)
         ((equal? indice 1)
-         (~a(caar lista))
+         (~a(car lista))
          )
         (else
          (elemento (- indice 1)(cdr lista)))))
@@ -47,6 +47,13 @@
       (for([j (in-range tamano)])
         ((draw-solid-rectangle ventana2) (make-posn (* 100 j) (* 100 i)) 100 100 (elemento contador (buscarCara cara listaCuadros)))
         (set! contador (+ 1 contador))
+        )
+      )
+    ;;dibuja lineas para distinguir los cuadros de la cara
+    (for ([h (in-range (+ 1 tamano))])
+      (for([k (in-range (+ 1 tamano))])
+        ((draw-solid-rectangle ventana2) (make-posn (* 100 k) (* 100 h)) 5 (* 100 tamano) "black")
+        ((draw-solid-rectangle ventana2) (make-posn (* 100 k) (* 100 h)) (* 100 tamano) 5 "black")
         )
       )
     (copy-viewport ventana2 ventana);;copia el dibujo que hay en la ventana auxiliar a la ventana principal
@@ -87,10 +94,7 @@
                             (teclado (key-value (get-key-press ventana))))
                   
                           (if (equal? tecla #\space)
-                              (begin
-                                (print #\space)
-                                (teclado (key-value (get-key-press ventana))))
-
+                             listaCuadros
                               ;else
                               (teclado (key-value (get-key-press ventana)))
                               )
